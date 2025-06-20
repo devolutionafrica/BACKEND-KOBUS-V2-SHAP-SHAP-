@@ -1,0 +1,20 @@
+package com.nsia.cobus.domain.port;
+
+import java.util.List;
+
+import com.nsia.cobus.domain.models.User;
+import com.nsia.cobus.domain.models.UserLoginAndPassword;
+
+public interface UserRepositoryPort {
+
+    User saveUser(User user);
+
+    User login(UserLoginAndPassword user);
+
+    List<User> getAllUsers();
+
+    User findUserByUsername(String username);
+
+    Object getProfilinfoByUsername(String username);
+
+}

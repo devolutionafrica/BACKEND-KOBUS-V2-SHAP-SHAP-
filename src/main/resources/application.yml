@@ -1,0 +1,34 @@
+# --- Configuration de la Base de Données Principale (SQL Server) ---
+
+spring:
+  application:
+    name: Kobus v2
+  datasource:
+    primary:
+      jdbcUrl: jdbc:sqlserver://10.250.250.3:1433;databaseName=VIE_CAMEROUN_EXT_TEST_CLI_UNIQ_V2;encrypt=true;trustServerCertificate=true;
+      username: DEVODEV
+      password: "@test32603!"
+      driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+      hikari:
+        pool-name: PrimaryConnexionPool
+        maximum-pool-size: 100000
+        connection-timeout: 30000
+        idle-timeout: 600000 # 10 minutes
+        max-lifetime: 1800000 # 30 minutes
+
+    secondary:
+      jdbcUrl: jdbc:sqlserver://10.10.3.145:1433;databaseName=DWH_SUNSHINE;encrypt=true;trustServerCertificate=true;
+      username: report
+      password: "D@shboard2"
+      driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+      hikari:
+        pool-name: SecondaryConnexionPool
+        maximum-pool-size: 100000
+        connection-timeout: 30000
+        idle-timeout: 600000 # 10 minutes
+        max-lifetime: 1800000 # 30 minutes
+
+  app:
+    jwt:
+      secret: K!z8E^a7@wP1$N#3sG2tFv*YqLzRbUeM
+      expiration-in-ms: 7200000
