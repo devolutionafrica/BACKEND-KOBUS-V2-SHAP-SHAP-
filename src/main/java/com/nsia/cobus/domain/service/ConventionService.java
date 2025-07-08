@@ -20,4 +20,8 @@ public class ConventionService {
     public Map<String, Object> fetchAllContratForConvention(String username, int conventionId) {
         return conventionRepositoryPort.getAllContratForConvention(username, conventionId);
     }
+
+    public Object fetchAvisSituationForConvention(String username, String conventionId, String annee) {
+        return conventionRepositoryPort.getAvisSituationForConvention(username, conventionId, annee);
+    }
 }

@@ -17,4 +17,6 @@ public interface UserRepositoryPort {
 
     Object getProfilinfoByUsername(String username);
 
+    void firstConnexion(String username, String password, String newPassword, String phone, String email, String login);
+
 }

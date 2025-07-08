@@ -23,4 +23,9 @@ public record UserService(
         return userRepositoryPort.getProfilinfoByUsername(username);
     }
 
+    public void updateSetFirstConnexion(String username, String newPassword, String password, String email,
+            String phone, String login) {
+        userRepositoryPort.firstConnexion(username, password, newPassword, phone, email, login);
+    }
+
 }

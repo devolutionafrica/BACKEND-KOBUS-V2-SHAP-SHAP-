@@ -13,8 +13,10 @@ public class SWagerConfig {
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
                 .info(new Info().title(
-                        "Api permettant la gestion des souscriptions à des assurances par des membres de ONG Action'Elle")
+                        """
+                                API permettant aux clients NSIA de se connecter et de consulter leurs informations sur les contrats d'assurances auquelles ils ont souscrits.
+                                    """)
                         // .version("1.0")
-                        .description("API pour gérer des produits de garanties"));
+                        .description("Api de consultation et de souscription aux produits d'assurances De NSIA "));
     }
 }

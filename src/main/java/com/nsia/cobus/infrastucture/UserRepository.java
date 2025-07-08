@@ -77,4 +77,59 @@ public class UserRepository implements UserRepositoryPort {
 
     }
 
+    @Override
+    public void firstConnexion(String username, String password, String newPassword, String phone, String email,
+            String login) {
+
+        String reqPassword = """
+                UPDATE Utilisateur
+                 SET MOT_DE_PASSE = @NewPassword, ISFIRSTCONNEXION=1
+                 WHERE LOGIN = @Login
+                """;
+
+        jdbcTemplate.update(reqPassword, newPassword, login);
+
+        String reqIdClient = """
+                select u.ide_client_unique
+                from utilisateur u
+                where u.login = @Login
+                """;
+
+        Map<String, Object> ide_Client_unique = jdbcTemplate.queryForMap(reqIdClient, login, new ColumnMapRowMapper());
+        Integer idClientUnique = (Integer) ide_Client_unique.get("ide_client_unique");
+        String req = """
+                BEGIN TRY
+                    BEGIN TRANSACTION;
+
+                    -- Première mise à jour
+                    UPDATE Utilisateur
+                    SET EMAIL = ?,
+                        Mobile = ?
+                    WHERE LOGIN = ?;
+
+                    -- Deuxième mise à jour
+                    UPDATE CLIENT_UNIQUE
+                    SET TELEPHONE = ?
+                    WHERE IDE_CLIENT_UNIQUE = ?;
+
+                    -- Si tout se passe bien, validez la transaction
+                    COMMIT TRANSACTION;
+                END TRY
+                    BEGIN CATCH
+                        -- Si une erreur survient, annulez la transaction
+                        IF @@TRANCOUNT > 0
+                            ROLLBACK TRANSACTION;
+
+                        -- Vous pouvez loguer l'erreur ou la remonter si nécessaire
+                        -- Exemple pour remonter l'erreur à l'application
+                        DECLARE @ErrorMessage NVARCHAR(MAX), @ErrorSeverity INT, @ErrorState INT;
+                        SELECT @ErrorMessage = ERROR_MESSAGE(), @ErrorSeverity = ERROR_SEVERITY(), @ErrorState = ERROR_STATE();
+
+                    RAISERROR (@ErrorMessage, @ErrorSeverity, @ErrorState);
+                END CATCH;
+                """;
+
+        jdbcTemplate.update(req, email, phone, login, phone, idClientUnique);
+    }
+
 }
