@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/cobus/auth")
+@RequestMapping("/api/v1/kobus/auth")
 public class AuthController {
 
     // private final LoadAllUser loadAllUser;

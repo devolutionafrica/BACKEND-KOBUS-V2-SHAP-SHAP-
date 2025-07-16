@@ -14,7 +14,7 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/cobus/agence")
+@RequestMapping("/api/v1/kobus/agence")
 public class AgencyController {
 
     private final ReadAllAgence readAllAgence;

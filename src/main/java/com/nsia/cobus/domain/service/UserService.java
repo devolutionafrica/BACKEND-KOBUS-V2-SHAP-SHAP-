@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.nsia.cobus.domain.models.ChangePasswordModel;
+import com.nsia.cobus.domain.models.ChangeUserInfoModel;
 import com.nsia.cobus.domain.models.User;
 import com.nsia.cobus.domain.port.UserRepositoryPort;
 
@@ -26,6 +28,14 @@ public record UserService(
     public void updateSetFirstConnexion(String username, String newPassword, String password, String email,
             String phone, String login) {
         userRepositoryPort.firstConnexion(username, password, newPassword, phone, email, login);
+    }
+
+    public String updatePassword(ChangePasswordModel changePasswordModel) {
+        return userRepositoryPort.updatePassword(changePasswordModel);
+    }
+
+    public String updateChangeUserInfo(ChangeUserInfoModel user) {
+        return userRepositoryPort.updateUserInfo(user);
     }
 
 }

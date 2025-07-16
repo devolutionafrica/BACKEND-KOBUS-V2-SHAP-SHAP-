@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
-@RequestMapping("/api/v1/cobus/contrat")
+@RequestMapping("/api/v1/kobus/contrat")
 @RequiredArgsConstructor
 public class ContratController {
 

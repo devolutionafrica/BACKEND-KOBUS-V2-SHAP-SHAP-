@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/cobus/corporate/convention")
+@RequestMapping("/api/v1/kobus/corporate/convention")
 public class ConventionController {
 
     private final ReadConventionForCorporate readConventionForCorporate;
