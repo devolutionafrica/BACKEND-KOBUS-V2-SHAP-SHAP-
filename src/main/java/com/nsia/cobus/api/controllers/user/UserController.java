@@ -2,13 +2,16 @@ package com.nsia.cobus.api.controllers.user;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.nsia.cobus.api.dto.FirstUserInfo;
 import com.nsia.cobus.config.JwtUtils;
 import com.nsia.cobus.domain.ReadProfilInfo;
+import com.nsia.cobus.domain.ReadRateEngagement;
 import com.nsia.cobus.domain.SetUpdateFirstConnexionInformation;
 import com.nsia.cobus.domain.UpdatePassword;
 import com.nsia.cobus.domain.UpdateUserInfo;
@@ -30,6 +33,7 @@ public class UserController {
     private final JwtUtils jwtUtils;
     private final UpdatePassword updatePassword;
     private final UpdateUserInfo updateUserInfo;
+    private final ReadRateEngagement readRateEngagement;
 
     @GetMapping("/profil")
     public ResponseEntity<?> getProfilInfo(
@@ -56,15 +60,20 @@ public class UserController {
         return ResponseEntity.ok("Bienvenue vos données ont été mis à jour avec succès");
     }
 
-    @PutMapping("/user/change-password")
+    @PutMapping("/change-password")
     public ResponseEntity<String> updatePassword(@RequestBody @Valid ChangePasswordModel changePasswordModel) {
 
         return ResponseEntity.ok(updatePassword.updatePassword(changePasswordModel));
     }
 
-    @PutMapping("/user/update")
+    @PutMapping("/update")
     public ResponseEntity<String> updateUserInfo(@RequestBody @Valid ChangeUserInfoModel user) {
         return ResponseEntity.ok(updateUserInfo.doUpdateUserinfo(user));
+    }
+
+    @GetMapping("/{username}/engagement")
+    public ResponseEntity<Double> getTauxEngagement(@PathVariable String username) {
+        return ResponseEntity.ok(readRateEngagement.doRead(username));
     }
 
 }

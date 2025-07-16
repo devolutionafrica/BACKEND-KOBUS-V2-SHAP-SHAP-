@@ -38,4 +38,8 @@ public record UserService(
         return userRepositoryPort.updateUserInfo(user);
     }
 
+    public double getTauxEngagement(String username) {
+        return userRepositoryPort.getEngagement(username);
+    }
+
 }

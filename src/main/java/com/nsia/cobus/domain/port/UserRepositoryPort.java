@@ -15,6 +15,8 @@ public interface UserRepositoryPort {
 
     List<User> getAllUsers();
 
+    double getEngagement(String username);
+
     User findUserByUsername(String username);
 
     Object getProfilinfoByUsername(String username);

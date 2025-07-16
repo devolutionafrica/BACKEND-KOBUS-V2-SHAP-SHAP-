@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.poi.poifs.nio.DataSource;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.ColumnMapRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -23,6 +24,9 @@ import jakarta.validation.Valid;
 public class UserRepository implements UserRepositoryPort {
 
     private final JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    ContratRepository contratRepository;
 
     public UserRepository(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
@@ -212,6 +216,39 @@ public class UserRepository implements UserRepositoryPort {
         } catch (Exception e) {
             return "Erreur lors de la modification des info personnelles";
         }
+    }
+
+    @Override
+    public double getEngagement(String username) {
+
+        // recuperation de tous les contrats de l'utilisateur
+
+        List<Map<String, Object>> contrats = contratRepository.getAllContratByUsername(username);
+
+        int countSolde = 0;
+        int countQuittance = 0;
+        double engagement = 0;
+        for (Map<String, Object> contrat : contrats) {
+            String deb = (String) contrat.get("DATE_DEBUT_EFFET_POLICE").toString().substring(0, 4);
+            String fin = (String) contrat.get("DATE_DEBUT_FIN_POLICE").toString().substring(0, 4);
+            String policeId = (String) contrat.get("NUMERO_POLICE");
+            List<Map<String, Object>> quittances = (List<Map<String, Object>>) contratRepository
+                    .getAllCotisationByData(policeId, deb, fin).get("cotisations");
+
+            countQuittance += quittances.size();
+            for (Map<String, Object> quittance : quittances) {
+                if (quittance.get("EtatQuittance").equals("Soldée")) {
+                    countSolde += 1;
+                }
+            }
+
+        }
+        if (countQuittance == 0 || countSolde == 0) {
+            return 0d;
+        }
+        engagement = countSolde / countQuittance;
+        return engagement;
+
     }
 
 }

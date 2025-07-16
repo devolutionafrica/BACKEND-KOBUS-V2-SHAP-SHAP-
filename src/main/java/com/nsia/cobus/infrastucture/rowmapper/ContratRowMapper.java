@@ -18,6 +18,9 @@ public class ContratRowMapper implements RowMapper<Contract> {
         contrat.setInsuredNumber(rs.getString("numero_adherent"));
         contrat.setProductName(rs.getString("Libeele_de_convention"));
         contrat.setPolicyStartDate(rs.getString("date_debut_effet_police"));
+        contrat.setAnnuityDuration("DUREE_RENTE");
+        contrat.setPolicyEndDate("DATE_FIN_EFFET_POLICE");
+        // contrat.
         return contrat;
     }
 
