@@ -223,32 +223,39 @@ public class UserRepository implements UserRepositoryPort {
 
         // recuperation de tous les contrats de l'utilisateur
 
-        List<Map<String, Object>> contrats = contratRepository.getAllContratByUsername(username);
+        String req = """
+                SELECT COUNT(*) 'NOMBRE', S.ETAT_QUITTANCE FROM SummaryQuittanceSoldeesImpayees S INNER JOIN CONTRATS C ON (S.NUMERO_POLICE=C.NUMERO_POLICE) INNER JOIN UTILISATEUR U ON (U.IDE_CLIENT_UNIQUE=C.IDE_CLIENT_UNIQUE)
+                WHERE U.LOGIN=?
+                GROUP BY S.ETAT_QUITTANCE
+                            """;
 
-        int countSolde = 0;
-        int countQuittance = 0;
-        double engagement = 0;
-        for (Map<String, Object> contrat : contrats) {
-            String deb = (String) contrat.get("DATE_DEBUT_EFFET_POLICE").toString().substring(0, 4);
-            String fin = (String) contrat.get("DATE_DEBUT_FIN_POLICE").toString().substring(0, 4);
-            String policeId = (String) contrat.get("NUMERO_POLICE");
-            List<Map<String, Object>> quittances = (List<Map<String, Object>>) contratRepository
-                    .getAllCotisationByData(policeId, deb, fin).get("cotisations");
+        List<Map<String, Object>> data = jdbcTemplate.queryForList(req, username);
 
-            countQuittance += quittances.size();
-            for (Map<String, Object> quittance : quittances) {
-                if (quittance.get("EtatQuittance").equals("Soldée")) {
-                    countSolde += 1;
-                }
+        System.out.println("Taux d'engagement: \n\n" + data + "Total:" + calculTotal(data));
+        int total = calculTotal(data);
+        int nbSolde = nombreQuittanceSolde(data);
+        if (total > 0) {
+            return nbSolde / total;
+        }
+        return 0;
+
+    }
+
+    private int calculTotal(List<Map<String, Object>> data) {
+        int count = 0;
+        for (Map ele : data) {
+            count += (int) ele.get("NOMBRE");
+        }
+        return count;
+    }
+
+    private int nombreQuittanceSolde(List<Map<String, Object>> data) {
+        for (Map<String, Object> item : data) {
+            if (item.get("ETAT_QUITTANCE").equals("Soldée")) {
+                return (int) item.get("NOMBRE");
             }
-
         }
-        if (countQuittance == 0 || countSolde == 0) {
-            return 0d;
-        }
-        engagement = countSolde / countQuittance;
-        return engagement;
-
+        return 0;
     }
 
 }

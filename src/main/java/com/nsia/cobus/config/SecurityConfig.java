@@ -53,12 +53,12 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         return http.csrf(AbstractHttpConfigurer::disable)
                 .cors(c -> c.configurationSource(configurationSource()))
                 .authorizeHttpRequests(
-                        request -> request.requestMatchers("/api/v1/cobus/auth/**").permitAll()
+                        request -> request.requestMatchers("/api/v1/kobus/auth/*").permitAll()
                                 .requestMatchers("/api/v1/docs/**", "api/v1/swagger-ui/**", "swagger-ui/**",
                                         "/swagger-ui/index.html",
                                         "/v3/api-docs/**")

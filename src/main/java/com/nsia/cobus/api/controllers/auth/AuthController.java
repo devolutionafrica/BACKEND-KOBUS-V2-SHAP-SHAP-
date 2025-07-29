@@ -80,4 +80,10 @@ public class AuthController {
         }
     }
 
+    @PostMapping("/reset")
+    public ResponseEntity<String> postMethodName(@RequestBody String entity) {
+        return ResponseEntity.ok("Mot de passe de réinitialisation envoyé");
+    }
+    
+
 }

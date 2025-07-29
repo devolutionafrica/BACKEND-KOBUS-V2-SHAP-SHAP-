@@ -19,7 +19,7 @@ import com.nsia.cobus.domain.models.ProductCategory;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/kobus/v1")
+@RequestMapping("/api/kobus/v1/product")
 @RequiredArgsConstructor
 public class ProductController {
 
@@ -28,7 +28,7 @@ public class ProductController {
     private final ReadProductByCategory readProductByCategory;
     private final ReadProductBykeyword readProductBykeyword;
 
-    @GetMapping("/products")
+    @GetMapping("")
     private ResponseEntity<List<Product>> getAllProduct() {
         return ResponseEntity.ok(readProduct.doReadAllProduct());
     }
@@ -38,7 +38,7 @@ public class ProductController {
         return ResponseEntity.ok(readAllProductCategory.readAllProductCategory());
     }
 
-    @GetMapping("/product/{category}/list-product")
+    @GetMapping("/{category}/list-product")
     private ResponseEntity<List<Product>> getProductByFamily(@PathVariable String category) {
         return ResponseEntity.ok(readProductByCategory.readProductByCategory(category));
     }
@@ -47,7 +47,7 @@ public class ProductController {
      * Cette méthode prend en paramètre le mot clé à rechercher dans la liste des
      * paramètre
      */
-    @GetMapping("/products/search")
+    @GetMapping("/search")
     public ResponseEntity<List<Product>> getProductByKeyword(@RequestParam String keyword) {
         return ResponseEntity.ok(readProductBykeyword.readProductByKeyword(keyword));
     }

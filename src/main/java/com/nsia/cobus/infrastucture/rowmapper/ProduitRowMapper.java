@@ -14,9 +14,9 @@ public class ProduitRowMapper implements RowMapper<Product> {
         Product produit = new Product();
         produit.setCodeFilliale(rs.getString("CODE_FILIALE"));
         produit.setCodeProduction(rs.getString("CODE_PRODUCTION"));
-        produit.setName("DESC_PRODUIT");
+        produit.setName(rs.getString("DESC_NATURE_POLICE"));
         produit.setIdeProduit(rs.getString("IDE_PRODUIT"));
-        produit.setFamille(rs.getString("DESC_NATURE_PRODUIT"));
+        produit.setFamille(rs.getString("DESC_NATURE_POLICE"));
         return produit;
     }
 

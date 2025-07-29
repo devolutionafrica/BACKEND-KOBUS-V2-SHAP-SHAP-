@@ -10,7 +10,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ReadRateEngagement {
 
-    private UserService userService;
+    private final UserService userService;
 
     public double doRead(String username) {
         return userService.getTauxEngagement(username);

@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 @Data
 @RequiredArgsConstructor
 public class UserLoginAndPassword {
-
+    
     public String username;
     public String password;
 

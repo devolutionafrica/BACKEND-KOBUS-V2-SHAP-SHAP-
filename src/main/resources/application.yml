@@ -5,9 +5,12 @@ spring:
     name: Kobus v2
   datasource:
     primary:
-      jdbcUrl: jdbc:sqlserver://10.250.250.3:1433;databaseName=VIE_CAMEROUN_EXT_TEST_CLI_UNIQ_V2;encrypt=true;trustServerCertificate=true;
-      username: DEVODEV
-      password: "@test32603!"
+      # jdbcUrl: jdbc:sqlserver://10.250.250.3:1433;databaseName=VIE_CAMEROUN_EXT_TEST_CLI_UNIQ_V2;encrypt=true;trustServerCertificate=true;
+      jdbcUrl: jdbc:sqlserver://DEV-DSK-C010:1433;databaseName=VIE_CAMEROUN_EXT_TEST_CLI_UNIQ_V2;encrypt=true;trustServerCertificate=true;
+      # username: DEVODEV
+      # password: "@test32603!"
+      username: solosolo
+      password: "23AL86196$"
       driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
       hikari:
         pool-name: PrimaryConnexionPool

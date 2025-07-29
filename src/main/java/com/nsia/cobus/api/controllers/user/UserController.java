@@ -73,6 +73,7 @@ public class UserController {
 
     @GetMapping("/{username}/engagement")
     public ResponseEntity<Double> getTauxEngagement(@PathVariable String username) {
+        System.out.println("Appel engagement");
         return ResponseEntity.ok(readRateEngagement.doRead(username));
     }
 

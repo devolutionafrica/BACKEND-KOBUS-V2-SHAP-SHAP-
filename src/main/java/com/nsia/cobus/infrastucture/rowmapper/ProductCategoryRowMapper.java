@@ -13,8 +13,8 @@ public class ProductCategoryRowMapper implements RowMapper<ProductCategory> {
     public ProductCategory mapRow(ResultSet rs, int rowNum) throws SQLException {
         ProductCategory category = new ProductCategory();
 
-        category.setName("DESC_NATURE_POLICE");
-        category.setNature("CODE_NATURE_PRODUIT");
+        category.setName(rs.getString("DESC_NATURE_POLICE"));
+        category.setNature(rs.getString("CODE_NATURE_PRODUIT"));
         return category;
     }
 

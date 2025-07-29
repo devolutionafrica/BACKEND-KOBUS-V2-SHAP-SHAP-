@@ -27,13 +27,13 @@ public class ProduitRepository implements ProduitRepositoryPort {
 
     @Override
     public List<ProductCategory> fetchAllProductCategory() {
-        String req = "SELECT DISTINCT DESC_NATURE_POLICE FROM produits";
+        String req = "SELECT DISTINCT DESC_NATURE_POLICE,CODE_NATURE_PRODUIT FROM produits";
         return jdbcTemplate.query(req, new ProductCategoryRowMapper());
     }
 
     @Override
     public List<Product> fetchProductByCategory(String categorie) {
-        String req = "SELECT * FROM PRODUIT WHERE DESC_NATURE_POLICE = ?";
+        String req = "SELECT * FROM PRODUITS WHERE CODE_NATURE_PRODUIT = ?";
         return jdbcTemplate.query(req, new ProduitRowMapper(), new Object[] { categorie });
     }
 
