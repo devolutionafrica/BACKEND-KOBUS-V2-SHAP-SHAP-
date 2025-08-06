@@ -20,8 +20,9 @@ public class ChangeUserInfoModel {
     private String nationality;
     private String statusMatrimonial;
     private String city;
+    private String gender;
     @NotNull
     @NotBlank
-    private String login;
+    private String username;
 
 }

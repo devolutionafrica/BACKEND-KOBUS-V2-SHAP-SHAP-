@@ -1,20 +1,15 @@
 package com.nsia.cobus.domain.models;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-
-import java.util.List;
+import lombok.EqualsAndHashCode.Exclude;
 
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-public class User {
+public class ClientModel {
+
     private String userId;
     private String userTypeId;
     private String login;
+    @Exclude
     private String password;
     private int isWindowsAccount;
     private String email;

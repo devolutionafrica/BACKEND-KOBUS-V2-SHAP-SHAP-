@@ -11,7 +11,7 @@ public class ChangePasswordModel {
 
     @NotNull
     @NotBlank
-    private String login;
+    private String username;
     @NotNull
     @NotBlank
     private String password;

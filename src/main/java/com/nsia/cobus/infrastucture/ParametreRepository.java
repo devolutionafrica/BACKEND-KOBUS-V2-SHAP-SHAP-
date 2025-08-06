@@ -19,14 +19,14 @@ public class ParametreRepository implements ParametreRepositoryPort {
 
     @Override
     public List<FillialeModel> getAllFilliales() {
-        String sql = "SELECT * FROM filliale";
+        String sql = "SELECT * FROM filiale";
         return jdbcTemplate.query(sql, new FillialeRowMapper());
     }
 
     @Override
     public FillialeModel getFillialeById(String codeFilliale) {
         String req = """
-                SELECT * FROM FILLIALE WHERE CodeFiliale = ?
+                SELECT * FROM FILIALE WHERE CodeFiliale = ?
                 """;
         return jdbcTemplate.queryForObject(req, new FillialeRowMapper(), codeFilliale);
     }

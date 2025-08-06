@@ -5,13 +5,12 @@ import java.util.List;
 import com.nsia.cobus.domain.models.ChangePasswordModel;
 import com.nsia.cobus.domain.models.ChangeUserInfoModel;
 import com.nsia.cobus.domain.models.User;
-import com.nsia.cobus.domain.models.UserLoginAndPassword;
 
 public interface UserRepositoryPort {
 
     User saveUser(User user);
 
-    User login(UserLoginAndPassword user);
+    // UserModel login(UserLoginAndPassword user);
 
     List<User> getAllUsers();
 
@@ -26,5 +25,11 @@ public interface UserRepositoryPort {
     String updatePassword(ChangePasswordModel changePasswordModel);
 
     String updateUserInfo(ChangeUserInfoModel changeUserInfoModel);
+
+    Integer getProfilCompletion(String username);
+
+    String requestToResetPassword(String username, String email);
+
+    String resetPassword(String username, String newPassword, String code);
 
 }

@@ -14,7 +14,6 @@ import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
 @RequestMapping("/api/v1/kobus/parameters")
@@ -25,7 +24,7 @@ public class ParameterController {
     private final ReadFilialeByCode readFilialeByCode;
 
     @GetMapping("/filiale")
-    public ResponseEntity<List<FillialeModel>> findAllFilliale(@RequestParam String param) {
+    public ResponseEntity<List<FillialeModel>> findAllFilliale() {
         return ResponseEntity.ok(readAllFilliale.doRead());
     }
 

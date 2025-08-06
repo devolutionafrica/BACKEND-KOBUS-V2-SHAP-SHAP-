@@ -4,9 +4,16 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.nsia.cobus.config.JwtUtils;
 import com.nsia.cobus.domain.ReadProfilInfo;
+import com.nsia.cobus.domain.ReadUserByusername;
+import com.nsia.cobus.domain.RequestToResetPassword;
+import com.nsia.cobus.domain.ResetPassWord;
+import com.nsia.cobus.domain.models.User;
+import com.nsia.cobus.domain.models.IsConnectModel;
 // import com.nsia.cobus.domain.LoadAllUser;
 // import com.nsia.cobus.domain.models.User;
 import com.nsia.cobus.domain.models.UserLoginAndPassword;
+import com.nsia.cobus.domain.service.UserService;
+import com.nsia.cobus.service.EmailService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -20,7 +27,9 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -33,41 +42,33 @@ public class AuthController {
     // private final LoadAllUser loadAllUser;
 
     private final AuthenticationManager authenticationManager;
-    private final ReadProfilInfo readProfilInfo;
+    private final ReadUserByusername readUserByusername;
     private final JwtUtils jwtUtils;
-    // private final UtilisateurRepository utilisateurRepository;
-
-    // @GetMapping("")
-    // public User getUser(@RequestParam String username) {
-    // return loadAllUser.doUserById(username);
-    // }
+    private final RequestToResetPassword requestToResetPassword;
+    private final ResetPassWord resetPassWord;
 
     @PostMapping("/login")
-    ResponseEntity<?> login(@RequestBody UserLoginAndPassword utilisateur) throws Exception {
+    ResponseEntity<IsConnectModel> login(@RequestBody UserLoginAndPassword utilisateur) throws Exception {
 
         try {
 
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(utilisateur.getUsername(), utilisateur.getPassword()));
+            IsConnectModel isConnectModel = new IsConnectModel();
             if (authentication.isAuthenticated()) {
                 String token = jwtUtils.generateToken(utilisateur.getUsername());
-                Map<String, Object> body = new HashMap<>();
-                // Utilisateur u=
-                Object user = readProfilInfo.readProfilInfo(utilisateur.username);
-                body.put("token", token);
-                // body.put("CODE_FILIALE", body);
-                body.put("user", user);
-                // body.put("userId",
-                // utilisateurRepository.findUserByUsername(utilisateur.getUsername()).getId());
-                // body.put("role",
-                // utilisateurRepository.findUserByUsername(utilisateur.getUsername()).getRoles());
-                return ResponseEntity.status(HttpStatus.OK).body(body);
+                User user = readUserByusername.doRead(utilisateur.username);
+                isConnectModel.setToken(token);
+                isConnectModel.setUserName(utilisateur.username);
+                isConnectModel.setCompteType(user.getUserTypeId());
+
+                return ResponseEntity.status(HttpStatus.OK).body(isConnectModel);
             }
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Donnée incorrecte");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         } catch (Exception e) {
             // log.error(e.getMessage());
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Error internal Service");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
     }
 
@@ -80,10 +81,17 @@ public class AuthController {
         }
     }
 
-    @PostMapping("/reset")
-    public ResponseEntity<String> postMethodName(@RequestBody String entity) {
-        return ResponseEntity.ok("Mot de passe de réinitialisation envoyé");
+    @PostMapping("/request-reset/{username}")
+    public ResponseEntity<String> requestResetPassword(@PathVariable String username, @RequestParam String email) {
+
+        return ResponseEntity.ok().body(requestToResetPassword.doRead(username, email));
     }
-    
+
+    @PutMapping("/reset-password")
+    public ResponseEntity<String> resetPassword(@RequestParam String username, @RequestParam String newPassword,
+            @RequestParam String code) {
+
+        return ResponseEntity.ok().body(resetPassWord.resetPassword(username, newPassword, code));
+    }
 
 }

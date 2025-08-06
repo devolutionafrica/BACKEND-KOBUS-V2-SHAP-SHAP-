@@ -8,29 +8,40 @@ import org.apache.poi.poifs.nio.DataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.ColumnMapRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Repository;
 
 import com.nsia.cobus.domain.models.ChangePasswordModel;
 import com.nsia.cobus.domain.models.ChangeUserInfoModel;
+import com.nsia.cobus.domain.models.ClientModel;
 import com.nsia.cobus.domain.models.User;
 import com.nsia.cobus.domain.models.UserLoginAndPassword;
 import com.nsia.cobus.domain.port.UserRepositoryPort;
 import com.nsia.cobus.infrastucture.rowmapper.ChangeUserInfoRowMapper;
+import com.nsia.cobus.infrastucture.rowmapper.ClientRowMapper;
 import com.nsia.cobus.infrastucture.rowmapper.UserRowMapper;
+import com.nsia.cobus.service.EmailService;
 
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 
 @Repository
+@RequiredArgsConstructor
 public class UserRepository implements UserRepositoryPort {
 
     private final JdbcTemplate jdbcTemplate;
+    // private final BCryptPasswordEncoder passwordEncoder;
+    private final EmailService emailService;
+
+    // public UserRepository(JdbcTemplate jdbcTemplate, BCryptPasswordEncoder
+    // passwordEncoder, EmailService emailService) {
+    // this.jdbcTemplate = jdbcTemplate;
+    // // this.passwordEncoder = passwordEncoder;
+    // // this.emailService = emailService;
+    // }
 
     @Autowired
     ContratRepository contratRepository;
-
-    public UserRepository(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
-    }
 
     @Override
     public User saveUser(User user) {
@@ -39,9 +50,24 @@ public class UserRepository implements UserRepositoryPort {
     }
 
     @Override
-    public User login(UserLoginAndPassword user) {
+    public String requestToResetPassword(String username, String email) {
+        String generateCode = generatePassword();
+        // String passwordEncode = passwordEncoder(generateCode);
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        String passwordEncode = passwordEncoder.encode(generateCode);
 
-        throw new UnsupportedOperationException("Unimplemented method 'login'");
+        String req = """
+                UPDATE UTILISATEUR
+                SET CODE_RESET_PASSWORD=?
+                WHERE LOGIN=?
+                """;
+
+        jdbcTemplate.update(req, passwordEncode, username);
+        emailService.envoyerEmail(email, "Demande de changement de mot de passe",
+                String.format(
+                        "\"Vous avez demandé un changement de mot de passe. Voici votre mot de passe de récupération %s:\"",
+                        generateCode));
+        return "Demande de changement de mot de passe envoyée";
     }
 
     @Override
@@ -55,34 +81,50 @@ public class UserRepository implements UserRepositoryPort {
 
     @Override
     public User findUserByUsername(String username) {
-        String req = "SELECT * FROM UTILISATEUR WHERE Login = ?";
-        return jdbcTemplate.queryForObject(req, new Object[] { username }, new UserRowMapper());
+        try {
+            String req = "SELECT * FROM UTILISATEUR WHERE Login = ?";
+            return jdbcTemplate.queryForObject(req, new Object[] { username }, new UserRowMapper());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
 
     }
 
     @Override
-    public Object getProfilinfoByUsername(String username) {
+    public ClientModel getProfilinfoByUsername(String username) {
 
-        try {
-            String req = """
-                    SELECT C.*, U.LOGIN
-                    FROM CLIENT_UNIQUE C inner join UTILISATEUR U on U.IDE_CLIENT_UNIQUE=C.IDE_CLIENT_UNIQUE
-                    where LOGIN = ?
-                    """;
-            String pourcentageReq = """
-                    SELECT * FROM FnPourcentageProfil(?)
-                    """;
+        String req = """
+                SELECT C.*, U.LOGIN
+                FROM CLIENT_UNIQUE C inner join UTILISATEUR U on U.IDE_CLIENT_UNIQUE=C.IDE_CLIENT_UNIQUE
+                where LOGIN = ?
+                """;
+        // String pourcentageReq = """
+        // SELECT * FROM FnPourcentageProfil(?)
+        // """;
 
-            Object user = jdbcTemplate.queryForObject(req, new Object[] { username }, new ColumnMapRowMapper());
-            Map pourcentage = (Map) jdbcTemplate.queryForObject(pourcentageReq, new Object[] {
-                    username }, new ColumnMapRowMapper());
-            Map<String, Object> result = new HashMap<>();
-            result.put("user", user);
-            result.put("complete", pourcentage.get("POURCENTAGE_PROFIL"));
-            return result;
-        } catch (Exception e) {
-            return "L'utilisateur n'existe pas";
-        }
+        ClientModel client = jdbcTemplate.queryForObject(req, new Object[] { username }, new ClientRowMapper());
+        // Map pourcentage = (Map) jdbcTemplate.queryForObject(pourcentageReq, new
+        // Object[] {
+        // username }, new ColumnMapRowMapper());
+        // Map<String, Object> result = new HashMap<>();
+        // result.put("user", user);
+        // result.put("complete", pourcentage.get("POURCENTAGE_PROFIL"));
+        return client;
+
+    }
+
+    @Override
+    public Integer getProfilCompletion(String username) {
+
+        String pourcentageReq = """
+                SELECT * FROM FnPourcentageProfil(?)
+                """;
+
+        Map pourcentage = jdbcTemplate.queryForObject(pourcentageReq, new Object[] {
+                username }, new ColumnMapRowMapper());
+
+        return (Integer) pourcentage.get("POURCENTAGE_PROFIL");
 
     }
 
@@ -145,30 +187,38 @@ public class UserRepository implements UserRepositoryPort {
     public String updatePassword(@Valid ChangePasswordModel changePasswordModel) {
         try {
             String reqSearchUser = "SELECT IDE_CLIENT_UNIQUE FROM UTILISATEUR WHERE LOGIN= ? AND MOT_DE_PASSE= ?";
-            String idClient = jdbcTemplate.queryForObject(reqSearchUser, String.class, changePasswordModel.getLogin(),
+            String idClient = jdbcTemplate.queryForObject(reqSearchUser, String.class,
+                    changePasswordModel.getUsername(),
                     changePasswordModel.getPassword());
             if (idClient == null) {
                 return "Les données sont incorrectes";
+            }
+            if (changePasswordModel.getNewPassword() == null || changePasswordModel.getNewPassword().equals("")) {
+                return "Le nouveau mot de passe ne peut pas être vide";
             }
             String updateReq = """
                     UPDATE UTILISATEUR
                     SET MOT_DE_PASSE=?
                     WHERE LOGIN=? AND MOT_DE_PASSE=?
                     """;
-            jdbcTemplate.update(updateReq, changePasswordModel.getNewPassword(), changePasswordModel.getLogin(),
+            jdbcTemplate.update(updateReq, changePasswordModel.getNewPassword(), changePasswordModel.getUsername(),
                     changePasswordModel.getPassword());
             return "Mot de passe bien modifié";
         } catch (Exception e) {
+            e.printStackTrace();
             return "Erreur de modification du mot de passe";
         }
     }
 
     @Override
-    public String updateUserInfo(@Valid ChangeUserInfoModel changeUserInfoModel) {
+    public String updateUserInfo(ChangeUserInfoModel changeUserInfoModel) {
         try {
+            System.out.println("usename:\n" + changeUserInfoModel.getUsername());
             String reqUniqueClient = "SELECT IDE_CLIENT_UNIQUE FROM UTILISATEUR WHERE LOGIN=?";
-            String ideClient = jdbcTemplate.queryForObject(reqUniqueClient, String.class,
-                    new Object[] { changeUserInfoModel.getLogin() });
+            String ideClient = jdbcTemplate.queryForObject(reqUniqueClient,
+                    new Object[] { changeUserInfoModel.getUsername() }, String.class);
+
+            System.out.println("Premier pas passé \n\n");
             if (ideClient == null) {
                 return "Aucun compte associé au username";
             }
@@ -181,39 +231,27 @@ public class UserRepository implements UserRepositoryPort {
                 jdbcTemplate.update(req, changeUserInfoModel.getEmail(), ideClient);
             }
 
-            String req = """
-                    SELECT * FROM CLIENT_UNIQUE
-                    FROM IDE_CLIENT_UNIQUE=?
-                    """;
-
             try {
-                ChangeUserInfoModel user = jdbcTemplate.queryForObject(req, new ChangeUserInfoRowMapper(), ideClient);
+
                 String updateUserReq = """
                         UPDATE CLIENT_UNIQUE
-                        SET PROFESSION=?,NATIONALITE=?,ADRESSE_POSTALE=?,TELEPHONE=?,SITUATION_MATRIMONIALE=?,LIEU_HABITATION=?,
+                        SET PROFESSION=ISNULL(?,PROFESSION),NATIONALITE=ISNULL(?,NATIONALITE),ADRESSE_POSTALE=ISNULL(?,ADRESSE_POSTALE),TELEPHONE=ISNULL(?,TELEPHONE),SITUATION_MATRIMONIALE=ISNULL(?,SITUATION_MATRIMONIALE),LIEU_HABITATION=ISNULL(?,LIEU_HABITATION),SEXE=ISNULL(?,SEXE)
                         """;
-                String profession = changeUserInfoModel.getPrefession() != null ? changeUserInfoModel.getPrefession()
-                        : user.getPrefession();
-                String city = changeUserInfoModel.getCity() != null ? changeUserInfoModel.getCity() : user.getCity();
-                String phone = changeUserInfoModel.getPhoneNumber() != null ? changeUserInfoModel.getPhoneNumber()
-                        : user.getPhoneNumber();
-                String adressPostal = changeUserInfoModel.getPostalAdress() != null
-                        ? changeUserInfoModel.getPostalAdress()
-                        : user.getPostalAdress();
-                String nationality = changeUserInfoModel.getNationality() != null ? changeUserInfoModel.getNationality()
-                        : user.getNationality();
-                String sm = changeUserInfoModel.getStatusMatrimonial() != null
-                        ? changeUserInfoModel.getStatusMatrimonial()
-                        : user.getStatusMatrimonial();
-                jdbcTemplate.update(updateUserReq, profession, nationality, adressPostal, phone, sm, city);
+
+                jdbcTemplate.update(updateUserReq, changeUserInfoModel.getPrefession(),
+                        changeUserInfoModel.getNationality(), changeUserInfoModel.getPostalAdress(),
+                        changeUserInfoModel.getPhoneNumber(), changeUserInfoModel.getStatusMatrimonial(),
+                        changeUserInfoModel.getCity(), changeUserInfoModel.getGender());
 
             } catch (Exception e) {
-                return "Email mis à jour";
+                e.printStackTrace();
+                return "Problème interne";
             }
 
             return "Profil mis à jour ";
 
         } catch (Exception e) {
+            e.printStackTrace();
             return "Erreur lors de la modification des info personnelles";
         }
     }
@@ -256,6 +294,42 @@ public class UserRepository implements UserRepositoryPort {
             }
         }
         return 0;
+    }
+
+    private String generatePassword() {
+        String characters = "0123456789";
+        StringBuilder password = new StringBuilder();
+        for (int i = 0; i < 6; i++) {
+            int randomIndex = (int) (Math.random() * characters.length());
+            password.append(characters.charAt(randomIndex));
+        }
+        return password.toString();
+    }
+
+    @Override
+    public String resetPassword(String username, String newPassword, String code) {
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        Map<String, ?> userInfo = jdbcTemplate.queryForMap("""
+                SELECT CODE_RESET_PASSWORD FROM UTILISATEUR WHERE LOGIN=?
+                """, username);
+        if (!passwordEncoder.matches(code, userInfo.get("CODE_RESET_PASSWORD").toString())) {
+            return "Code de réinitialisation invalide";
+        }
+        String req = """
+                UPDATE UTILISATEUR
+                SET MOT_DE_PASSE=?
+                WHERE LOGIN=? AND CODE_RESET_PASSWORD=?
+                """;
+        jdbcTemplate.update(req, newPassword, username, code);
+        jdbcTemplate.update("""
+                UPDATE UTILISATEUR
+                SET CODE_RESET_PASSWORD=NULL
+                WHERE LOGIN=?
+                """, username);
+        // if (updatedRows > 0) {
+        // return "Mot de passe réinitialisé avec succès";
+        // }
+        return "Mot de passe réinitialisé avec succès";
     }
 
 }

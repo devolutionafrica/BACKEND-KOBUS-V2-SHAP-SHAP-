@@ -12,15 +12,15 @@ public class FillialeRowMapper implements RowMapper<FillialeModel> {
     @Override
     public FillialeModel mapRow(ResultSet rs, int rowNum) throws SQLException {
         FillialeModel filliale = new FillialeModel();
-        filliale.setId(rs.getLong("ID"));
-        filliale.setCodeFiliale(rs.getString("CODE_FILIALE"));
+        filliale.setId(rs.getLong("IDFILIALE"));
+        filliale.setCodeFiliale(rs.getString("CODEFILIALE"));
         filliale.setLibelle(rs.getString("LIBELLE"));
-        filliale.setCurrency(rs.getString("CURRENCY"));
-        filliale.setCallCenterFilliale(rs.getString("CALL_CENTER_FILLIALE"));
-        filliale.setMailFilliale(rs.getString("MAIL_FILLIALE"));
-        filliale.setCodeFillialePaiement(rs.getString("CODE_FILLIALE_PAIEMENT"));
-        filliale.setMobilePagePied(rs.getString("MOBILE_PAGE_PIED"));
-        filliale.setUrlVideoPublicitaire(rs.getString("URL_VIDEO_PUBLICITAIRE"));
+        filliale.setCurrency(rs.getString("devise"));
+        filliale.setCallCenterFilliale(rs.getString("CALLCENTERFILIALE"));
+        filliale.setMailFilliale(rs.getString("MAILFILIALE"));
+        filliale.setCodeFillialePaiement(rs.getString("CODEFILIALEPAIEMENT"));
+        filliale.setMobilePagePied(rs.getString("MobilePiedPage"));
+        filliale.setUrlVideoPublicitaire(rs.getString("URLVIDEOPUBLICITAIRE"));
 
         return filliale;
     }

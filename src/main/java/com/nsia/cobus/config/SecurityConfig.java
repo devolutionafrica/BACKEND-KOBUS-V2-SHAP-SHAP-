@@ -37,6 +37,11 @@ public class SecurityConfig {
     }
 
     @Bean
+    public BCryptPasswordEncoder bCryptPasswordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    @Bean
     public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
         try {
             AuthenticationManagerBuilder authenticationManagerBuilder = http.getSharedObject(

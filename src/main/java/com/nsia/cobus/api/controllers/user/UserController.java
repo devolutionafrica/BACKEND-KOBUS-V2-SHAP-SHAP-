@@ -4,12 +4,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.nsia.cobus.api.dto.FirstUserInfo;
 import com.nsia.cobus.config.JwtUtils;
+import com.nsia.cobus.domain.ReadProfilCompletion;
 import com.nsia.cobus.domain.ReadProfilInfo;
 import com.nsia.cobus.domain.ReadRateEngagement;
 import com.nsia.cobus.domain.SetUpdateFirstConnexionInformation;
@@ -17,8 +18,8 @@ import com.nsia.cobus.domain.UpdatePassword;
 import com.nsia.cobus.domain.UpdateUserInfo;
 import com.nsia.cobus.domain.models.ChangePasswordModel;
 import com.nsia.cobus.domain.models.ChangeUserInfoModel;
+import com.nsia.cobus.domain.models.ClientModel;
 
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -34,9 +35,10 @@ public class UserController {
     private final UpdatePassword updatePassword;
     private final UpdateUserInfo updateUserInfo;
     private final ReadRateEngagement readRateEngagement;
+    private final ReadProfilCompletion readProfilCompletion;
 
     @GetMapping("/profil")
-    public ResponseEntity<?> getProfilInfo(
+    public ResponseEntity<ClientModel> getProfilInfo(
             HttpServletRequest request) {
 
         String token = request.getHeader("Authorization").split(" ")[1];
@@ -75,6 +77,11 @@ public class UserController {
     public ResponseEntity<Double> getTauxEngagement(@PathVariable String username) {
         System.out.println("Appel engagement");
         return ResponseEntity.ok(readRateEngagement.doRead(username));
+    }
+
+    @GetMapping("/profil/{username}/completion")
+    public ResponseEntity<Integer> getCompletionProfil(@PathVariable String username) {
+        return ResponseEntity.ok().body(readProfilCompletion.doRead(username));
     }
 
 }

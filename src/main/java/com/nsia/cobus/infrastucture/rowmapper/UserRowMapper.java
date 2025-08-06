@@ -14,12 +14,8 @@ public class UserRowMapper implements RowMapper<User> {
         User user = new User();
         user.setLogin(arg0.getString("Login"));
         user.setPassword(arg0.getString("Mot_de_passe"));
-        user.setIsFirstConnection(arg0.getInt("IsfirstConnexion"));
-        user.setEmail(arg0.getString("Email"));
-        user.setMobile(arg0.getString("Mobile"));
-        user.setCreationDate(arg0.getString("Date_creation"));
-        // user.setClientName(arg0.getString(""));
-        user.setUniqueClientIds(arg0.getString("ide_client_unique"));
+        user.setIsFirstConnection(arg0.getInt("ISFIRSTCONNEXION"));
+        user.setUserTypeId(arg0.getString("IDE_TYPE_UTILISATEUR"));
         return user;
     }
 
