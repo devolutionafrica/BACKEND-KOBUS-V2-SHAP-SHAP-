@@ -14,6 +14,7 @@ public class FillialeRowMapper implements RowMapper<FillialeModel> {
         FillialeModel filliale = new FillialeModel();
         filliale.setId(rs.getLong("IDFILIALE"));
         filliale.setCodeFiliale(rs.getString("CODEFILIALE"));
+        filliale.setApiUrl(rs.getString("APIURL"));
         filliale.setLibelle(rs.getString("LIBELLE"));
         filliale.setCurrency(rs.getString("devise"));
         filliale.setCallCenterFilliale(rs.getString("CALLCENTERFILIALE"));

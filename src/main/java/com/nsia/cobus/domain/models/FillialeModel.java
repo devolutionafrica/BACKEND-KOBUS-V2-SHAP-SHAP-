@@ -12,6 +12,7 @@ public class FillialeModel {
     private String codeFiliale;
     private String libelle;
     private String currency;
+    private String apiUrl;
     private String callCenterFilliale;
     private String mailFilliale;
     private String codeFillialePaiement;
