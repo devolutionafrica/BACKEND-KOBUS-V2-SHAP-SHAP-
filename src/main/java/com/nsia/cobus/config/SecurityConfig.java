@@ -63,14 +63,13 @@ public class SecurityConfig {
         return http.csrf(AbstractHttpConfigurer::disable)
                 .cors(c -> c.configurationSource(configurationSource()))
                 .authorizeHttpRequests(
-                        request -> request.requestMatchers("/api/v1/kobus/auth/*").permitAll()
+                        request -> request.requestMatchers("/api/v1/kobus/auth/*", "/api/v1/kobus/parameters/**")
+                                .permitAll()
                                 .requestMatchers("/api/v1/docs/**", "api/v1/swagger-ui/**", "swagger-ui/**",
                                         "/swagger-ui/index.html",
                                         "/v3/api-docs/**")
                                 .permitAll()
-                                // .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
-                                // .requestMatchers("/api/v1/simulations/*").authenticated()
-                                // .requestMatchers("/api/v1/cobus/**").permitAll()
+
                                 .anyRequest().authenticated())
 
                 .addFilterBefore(new JwtsFilter(userDetailsServiceCustom, jwtUtils),

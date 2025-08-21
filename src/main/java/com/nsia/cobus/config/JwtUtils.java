@@ -60,7 +60,7 @@ public class JwtUtils {
         return extractExpiDate(token).before(new Date(System.currentTimeMillis()));
     }
 
-    private Date extractExpiDate(String token) {
+    public Date extractExpiDate(String token) {
         return extractClaims(token, Claims::getExpiration);
     }
 
