@@ -23,9 +23,7 @@ public record ContratRepository(
         @Override
         public List<Map<String, Object>> getAllContratByUsername(String username) {
                 String query = """
-                                    Select C.*
-                                    From Contrats C inner join Utilisateur U on C.ide_client_unique = U.ide_client_unique
-                                    Where U.login = ?
+                                    Select * From dbo.FnConsultationPoliceDetail(?)
                                 """;
 
                 return jdbcTemplate.queryForList(query, username);

@@ -62,6 +62,7 @@ public class AuthController {
                 isConnectModel.setUserName(utilisateur.username);
                 isConnectModel.setCompteType(user.getUserTypeId());
 
+                isConnectModel.setExpiration(jwtUtils.extractExpiDate(token));
                 return ResponseEntity.status(HttpStatus.OK).body(isConnectModel);
             }
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
