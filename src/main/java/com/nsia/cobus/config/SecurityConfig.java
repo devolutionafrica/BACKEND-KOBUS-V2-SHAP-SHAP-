@@ -31,9 +31,9 @@ public class SecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() throws Exception {
-        return new BCryptPasswordEncoder();
+        // return new BCryptPasswordEncoder();
         // pour ne pas utiliser de mot de passe encrypté
-        // return NoOpPasswordEncoder.getInstance();
+        return NoOpPasswordEncoder.getInstance();
     }
 
     @Bean
