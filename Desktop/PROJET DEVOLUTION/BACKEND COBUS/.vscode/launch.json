@@ -1,0 +1,14 @@
+{
+  "configurations": [
+    {
+      "type": "java",
+      "name": "Spring Boot-CobusApplication<cobus>",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "mainClass": "com.nsia.cobus.CobusApplication",
+      "projectName": "cobus",
+      "args": "",
+      "envFile": "${workspaceFolder}/.env"
+    }
+  ]
+}
