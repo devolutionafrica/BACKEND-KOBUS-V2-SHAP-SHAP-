@@ -30,6 +30,6 @@ public interface UserRepositoryPort {
 
     String requestToResetPassword(String username, String email);
 
-    String resetPassword(String username, String newPassword, String code);
+    String resetPassword(String username, String newPassword, String code) throws Exception;
 
 }

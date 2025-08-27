@@ -75,14 +75,10 @@ public class UserService {
         }
     }
 
-    public String resetPassword(String username, String newPassword, String code) {
-        try {
-            return userRepositoryPort.resetPassword(username, newPassword, code);
+    public String resetPassword(String username, String newPassword, String code) throws Exception {
 
-        } catch (Exception e) {
-            e.printStackTrace();
-            return "Erreur lors de la réinitialisation du mot de passe";
-        }
+        return userRepositoryPort.resetPassword(username, newPassword, code);
+
     }
 
 }

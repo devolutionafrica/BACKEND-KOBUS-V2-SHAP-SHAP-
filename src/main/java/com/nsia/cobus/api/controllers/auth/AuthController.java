@@ -2,6 +2,8 @@ package com.nsia.cobus.api.controllers.auth;
 
 import org.springframework.web.bind.annotation.RestController;
 
+import com.nsia.cobus.api.dto.RequestToResetPasswordBody;
+import com.nsia.cobus.api.dto.ResetPasswordBody;
 import com.nsia.cobus.config.JwtUtils;
 import com.nsia.cobus.domain.ReadProfilInfo;
 import com.nsia.cobus.domain.ReadUserByusername;
@@ -82,17 +84,22 @@ public class AuthController {
         }
     }
 
-    @PostMapping("/request-reset/{username}")
-    public ResponseEntity<String> requestResetPassword(@PathVariable String username, @RequestParam String email) {
+    @PostMapping("/request-reset")
+    public ResponseEntity<String> requestResetPassword(
+            @RequestBody RequestToResetPasswordBody request) {
 
-        return ResponseEntity.ok().body(requestToResetPassword.doRead(username, email));
+        return ResponseEntity.ok().body(requestToResetPassword.doRead(request.getUsername(), request.getEmail()));
     }
 
     @PutMapping("/reset-password")
-    public ResponseEntity<String> resetPassword(@RequestParam String username, @RequestParam String newPassword,
-            @RequestParam String code) {
+    public ResponseEntity<String> resetPassword(@RequestBody ResetPasswordBody request) {
 
-        return ResponseEntity.ok().body(resetPassWord.resetPassword(username, newPassword, code));
+        try {
+            return ResponseEntity.ok().body(
+                    resetPassWord.resetPassword(request.getUsername(), request.getPassword(), request.getResetCode()));
+        } catch (Exception e) {
+            return ResponseEntity.status(400).body("Veuillez verifier votre code");
+        }
     }
 
 }

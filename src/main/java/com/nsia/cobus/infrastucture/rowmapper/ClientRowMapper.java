@@ -20,7 +20,7 @@ public class ClientRowMapper implements RowMapper<ClientModel> {
         user.setBankCode(arg0.getString("Code_Banque"));
         user.setRibKey(arg0.getString("Cle_Rib"));
 
-        // user.setEmail(arg0.getString("Email"));
+        user.setEmail(arg0.getString("EMAIL"));
         user.setPhoneNumber(arg0.getString("TELEPHONE"));
         user.setPhoneNumber1(arg0.getString("telephone_1"));
         user.setProfession(arg0.getString("Profession"));

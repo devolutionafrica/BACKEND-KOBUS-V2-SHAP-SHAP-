@@ -95,7 +95,7 @@ public class UserRepository implements UserRepositoryPort {
     public ClientModel getProfilinfoByUsername(String username) {
 
         String req = """
-                SELECT C.*, U.LOGIN
+                SELECT C.*, U.*
                 FROM CLIENT_UNIQUE C inner join UTILISATEUR U on U.IDE_CLIENT_UNIQUE=C.IDE_CLIENT_UNIQUE
                 where LOGIN = ?
                 """;
@@ -104,12 +104,8 @@ public class UserRepository implements UserRepositoryPort {
         // """;
 
         ClientModel client = jdbcTemplate.queryForObject(req, new Object[] { username }, new ClientRowMapper());
-        // Map pourcentage = (Map) jdbcTemplate.queryForObject(pourcentageReq, new
-        // Object[] {
-        // username }, new ColumnMapRowMapper());
-        // Map<String, Object> result = new HashMap<>();
-        // result.put("user", user);
-        // result.put("complete", pourcentage.get("POURCENTAGE_PROFIL"));
+        System.out.println("Email:" + client.getEmail());
+
         return client;
 
     }
@@ -307,13 +303,17 @@ public class UserRepository implements UserRepositoryPort {
     }
 
     @Override
-    public String resetPassword(String username, String newPassword, String code) {
+    public String resetPassword(String username, String newPassword, String code) throws Exception {
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         Map<String, ?> userInfo = jdbcTemplate.queryForMap("""
                 SELECT CODE_RESET_PASSWORD FROM UTILISATEUR WHERE LOGIN=?
                 """, username);
+        if (userInfo.get("CODE_RESET_PASSWORD") == null) {
+            throw new Exception();
+        }
         if (!passwordEncoder.matches(code, userInfo.get("CODE_RESET_PASSWORD").toString())) {
-            return "Code de réinitialisation invalide";
+            throw new Exception();
+            // return "Code de réinitialisation invalide";
         }
         String req = """
                 UPDATE UTILISATEUR

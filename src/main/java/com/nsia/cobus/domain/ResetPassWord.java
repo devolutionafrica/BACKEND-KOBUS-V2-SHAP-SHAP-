@@ -12,7 +12,7 @@ public class ResetPassWord {
 
     private final UserService userService;
 
-    public String resetPassword(String username, String newPassword, String code) {
+    public String resetPassword(String username, String newPassword, String code) throws Exception {
         return userService.resetPassword(username, newPassword, code);
     }
 
